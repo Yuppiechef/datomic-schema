@@ -46,7 +46,7 @@ You get the idea..
 In leiningen, simply add this to your dependencies
 
 ```clojure
-[datomic-schema "1.0.0"]
+[datomic-schema "1.0.1"]
 ```
 
 Or maven:
