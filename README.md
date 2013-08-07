@@ -56,11 +56,12 @@ A picture speaks a thousand words. I don't have a picture, but here's some code:
 
 ```clojure
 (ns myapp
-  (:use [datomic.schema :only [defpart defschema fields part]])
+  (:use [datomic-schema.schema :only [defpart defschema fields part]])
   (:require [datomic.api :as d])
-  (:require [datomic.schema :as s]))
+  (:require [datomic-schema.schema :as s])
+  (:gen-class))
   
-(defonce db-url "datomic:mem://inhouse")
+(defonce db-url "datomic:mem://testdb")
 
 (defpart app)
 
@@ -79,6 +80,7 @@ A picture speaks a thousand words. I don't have a picture, but here's some code:
    [permission :string :many]))
 
 (defn -main [& args]
+  (d/create-database db-url)
   (d/transact (d/connect db-url) (s/build-parts d/tempid))
   (d/transact (d/connect db-url) (s/build-schema d/tempid)))
 ```
