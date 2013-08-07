@@ -13,6 +13,7 @@ A simple example :
    [username :string :indexed]
    [pwd :string "Hashed password string"]
    [email :string :indexed]
+   [status :enum [:pending :active :inactive :cancelled]]
    [group :ref :many]))
 
 (defschema group
@@ -28,6 +29,11 @@ This will define the attributes:
 :user/username, :db.type/string, indexed
 :user/pwd, :db.type/string, :db/doc "Hashed password string"
 :user/email, :db.type/string, indexed
+:user/status, :db.type/ref
+:user.status/pending - in :db.user space
+:user.status/active - in :db.user space
+:user.status/inactive - in :db.user space
+:user.status/cancelled - in :db.user space
 :user/group, :db.type/ref, :db.cardinality/many
 :group/name, :db.type/string
 :group/permission, :db.type/string, :db.cardinality/many
@@ -71,6 +77,7 @@ A picture speaks a thousand words. I don't have a picture, but here's some code:
    [username :string :indexed]
    [pwd :string "Hashed password string"]
    [email :string :indexed]
+   [status :enum [:pending :active :inactive :cancelled]]
    [group :ref :many]))
 
 (defschema group
@@ -88,6 +95,8 @@ A picture speaks a thousand words. I don't have a picture, but here's some code:
 The crux of this is in the (s/build-parts) and (s/build-schema), which turns your defparts and defschemas into a nice long list of datomic schema transactions.
 
 You can build specific schema's by calling (s/generate-schema user group) - which will return a list of schema transactions just for those specific schemas, if you prefer to be verbose about it.
+
+Also notice that :enum resolves to a :ref type, the vector can be a list of strings: ["Pending" "Active" "Inactive" "cancelled"] or a list of keywords as shown. String will be converted to keywords by lowercasing and converting spaces to dashes, so "Bad User" will convert to :user.status/bad-user.
 
 ## Why pass in the d/tempid?
 
