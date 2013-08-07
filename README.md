@@ -93,6 +93,6 @@ Because I really didn't want to create a dependency on anything else for this li
 
 ## License
 
-Copyright © 2013 Yuppiechef (Pty) Ltd.
+Copyright © 2013 Yuppiechef Online (Pty) Ltd.
 
 Distributed under the Eclipse Public License, the same as Clojure.
