@@ -25,8 +25,14 @@
          (let [nm (if (string? n) (.replaceAll (.toLowerCase n) " " "-") (name n))]
            [:db/add (tempid-fn part) :db/ident (keyword basens nm)])) enums))
 
+(def unique-mapping
+  {:db.unique/value :db.unique/value
+   :db.unique/identity :db.unique/identity
+   :unique-value :db.unique/value
+   :unique-identity :db.unique/identity})
+
 (defn field-to-datomic [tempid-fn basename part acc [fieldname [type opts]]]
-  (let [uniq (or (opts :db.unique/value) (opts :db.unique/identity))
+  (let [uniq (first (remove nil? (map #(unique-mapping %) opts)))
         dbtype (keyword "db.type" (if (= type :enum) "ref" (name type)))
         result
         {:db/id (tempid-fn :db.part/db)
