@@ -37,6 +37,21 @@ You get the idea..
 
 ## Usage
 
+In leiningen, simply add this to your dependencies
+
+```clojure
+[datomic-schema "1.0.0"]
+```
+
+Or maven:
+```xml
+<dependency>
+  <groupId>datomic-schema</groupId>
+  <artifactId>datomic-schema</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
 A picture speaks a thousand words. I don't have a picture, but here's some code:
 
 ```clojure
