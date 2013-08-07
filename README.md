@@ -1,6 +1,6 @@
 # datomic-schema
 
-datomic-schema is made to make it easier to see visualize your datomic schema without sacrificing any features of Datomic.
+datomic-schema makes it easier to see your datomic schema without sacrificing any features of Datomic
 
 A simple example :
 
