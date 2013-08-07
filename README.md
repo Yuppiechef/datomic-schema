@@ -102,6 +102,18 @@ Also notice that :enum resolves to a :ref type, the vector can be a list of stri
 
 Because I really didn't want to create a dependency on anything else for this library. Not even datomic. Heck, I'm so pedantic about not wanting deps that I don't even depend on Clojure.
 
+## Possible keys to put on a field:
+
+Just a list of keys you'd be interested to use on fields - look at http://docs.datomic.com/schema.html for more detailed info
+
+```clojure
+;; Types
+:keyword :string :boolean :long :bigint :float :double :bigdec :ref :instant :uuid :uri :bytes :enum
+
+;; Options
+:indexed :many :fulltext :component :nohistory "Some doc string" [:arbitrary "Enum" :values]
+```
+
 ## License
 
 Copyright © 2013 Yuppiechef Online (Pty) Ltd.
