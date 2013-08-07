@@ -111,7 +111,7 @@ Just a list of keys you'd be interested to use on fields - look at http://docs.d
 :keyword :string :boolean :long :bigint :float :double :bigdec :ref :instant :uuid :uri :bytes :enum
 
 ;; Options
-:indexed :many :fulltext :component :nohistory "Some doc string" [:arbitrary "Enum" :values]
+:db.unique/value :db.unique/identity :indexed :many :fulltext :component :nohistory "Some doc string" [:arbitrary "Enum" :values]
 ```
 
 ## License
