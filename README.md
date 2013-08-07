@@ -98,6 +98,8 @@ You can build specific schema's by calling (s/generate-schema user group) - whic
 
 Also notice that :enum resolves to a :ref type, the vector can be a list of strings: ["Pending" "Active" "Inactive" "cancelled"] or a list of keywords as shown. String will be converted to keywords by lowercasing and converting spaces to dashes, so "Bad User" will convert to :user.status/bad-user.
 
+Last, but not least, the schemas that you define attaches themselves to their named vars, as you'd expect a def to do (not true for the defpart, unfortunately), so you can open up the structure and look at it.
+
 ## Why pass in the d/tempid?
 
 Because I really didn't want to create a dependency on anything else for this library. Not even datomic. Heck, I'm so pedantic about not wanting deps that I don't even depend on Clojure.
