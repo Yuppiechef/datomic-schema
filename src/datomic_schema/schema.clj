@@ -14,7 +14,7 @@
      (swap! schemalist conj (var ~nm))))
 
 (defmacro defpart [nm]
-  `(swap! partlist conj ~(keyword (name nm))))
+  `(swap! partlist conj ~(keyword "db.part" (name nm))))
 
 (defmacro part [nm]
   `{:part ~(keyword "db.part" (name nm))})
