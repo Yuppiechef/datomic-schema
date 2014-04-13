@@ -65,17 +65,38 @@
         part (or (:part schema) :db.part/user)]
     (reduce (partial field-to-datomic tempid-fn key part) acc (:fields schema))))
 
-(defn generate-schema [tempid-fn & schema]
-  (reduce (partial schema-to-datomic tempid-fn) [] schema))
-
 (defn part-to-datomic [tempid-fn acc part]
   (conj acc
         {:db/id (tempid-fn :db.part/db),
          :db/ident part
          :db.install/_partition :db.part/db}))
 
-(defn build-parts [tempid-fn partlist]
+(defn generate-parts [tempid-fn partlist]
   (reduce (partial part-to-datomic tempid-fn) [] partlist))
 
-(defn build-schema [tempid-fn entitylist]
-  (apply (partial generate-schema tempid-fn) entitylist))
+(defn generate-schema [tempid-fn schema]
+  (reduce (partial schema-to-datomic tempid-fn) [] schema))
+
+;; Use of the following functions are discouraged and only here for backwards compatibility.
+
+(defonce schemalist (atom #{}))
+(defonce partlist (atom #{}))
+
+(defmacro defschema [nm & maps]
+  `(do
+     (def ~nm (schema ~nm ~@maps))
+     (swap! schemalist conj ~nm)
+     (var ~nm)))
+
+(defmacro defpart [nm]
+  `(do
+     (def ~nm (part ~(name nm)))
+     (swap! partlist conj ~nm)
+     (var ~nm)))
+
+
+(defn build-parts [tempid-fn]
+  (generate-parts tempid-fn @partlist))
+
+(defn build-schema [tempid-fn]
+  (generate-schema tempid-fn @schemalist))

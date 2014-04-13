@@ -8,31 +8,6 @@
   
 (defonce db-url "datomic:mem://testdb")
 
-(defpart app)
-
-(defschema user
-  (fields
-   [username :string :indexed]
-   [pwd :string "Hashed password string"]
-   [email :string :indexed]
-   [status :enum [:pending :active :inactive :cancelled]]
-   [group :ref :many]))
-
-(defschema group
-  (fields
-   [name :string]
-   [permission :string :many]))
-
-(defn -main [& args]
-  (d/create-database db-url)
-  (d/transact
-   (d/connect db-url)
-   (concat
-    (s/build-parts d/tempid [app])
-    (s/build-schema d/tempid [user group]))))
-
-;; Alternatively, you can skip out the defschema and manage the datastructures yourself using schema:
-
 (defn dbparts []
   [(part "app")])
 
@@ -55,5 +30,13 @@
   (d/transact
    (d/connect url)
    (concat
-    (s/build-parts d/tempid (dbparts))
-    (s/build-schema d/tempid (dbschema)))))
+    (s/generate-parts d/tempid (dbparts))
+    (s/generate-schema d/tempid (dbschema)))))
+
+(defn -main [& args]
+  (setup-db db-url)
+  (println "Attributes defined in db:"
+           (map (comp :db/ident (partial d/entity (d/db (d/connect db-url))) first)
+                (d/q '[:find ?e :where [_ :db.install/attribute ?e]] (d/db (d/connect db-url))))))
+
+
