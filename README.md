@@ -2,13 +2,20 @@
 
 datomic-schema makes it easier to see your datomic schema without sacrificing any features of Datomic
 
-A simple example :
+## API Changes: v1.1.0
+
+This is a bit of an API breaking version, as I have removed the stateful nature of the defschema and defpart - You are now required to add the defined vars to the build-parts and build-schema functions. This is for simplicity - you don't expect a 'def' to also maintain some global state.
+
+If you prefer to use a 'global' state, see the second half of the example below - wrap your current defschema's into a function which returns a vector and rename all the (defschema) calls to just (schema)
+
+## Example
+
+A 2 second example :
 
 ```clojure
 (defpart app)
 
 (defschema user
-  (part app)
   (fields
    [username :string :indexed]
    [pwd :string "Hashed password string"]
@@ -17,10 +24,13 @@ A simple example :
    [group :ref :many]))
 
 (defschema group
-  (part app)
   (fields
    [name :string]
    [permission :string :many]))
+
+(concat
+  (s/build-parts d/tempid [app])
+  (s/build-schema d/tempid [user group])) 
 ```
 
 This will define the attributes:
@@ -46,7 +56,7 @@ You get the idea..
 In leiningen, simply add this to your dependencies
 
 ```clojure
-[datomic-schema "1.0.2"]
+[datomic-schema "1.1.0"]
 ```
 
 Or maven:
@@ -54,17 +64,19 @@ Or maven:
 <dependency>
   <groupId>datomic-schema</groupId>
   <artifactId>datomic-schema</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
 A picture speaks a thousand words. I don't have a picture, but here's some code:
 
 ```clojure
-(ns myapp
-  (:use [datomic-schema.schema :only [defpart defschema fields part]])
-  (:require [datomic.api :as d])
-  (:require [datomic-schema.schema :as s])
+(ns example.core
+  (:use
+   [datomic-schema.schema :only [defpart defschema fields part schema]])
+  (:require
+   [datomic.api :as d]
+   [datomic-schema.schema :as s])
   (:gen-class))
   
 (defonce db-url "datomic:mem://testdb")
@@ -72,7 +84,6 @@ A picture speaks a thousand words. I don't have a picture, but here's some code:
 (defpart app)
 
 (defschema user
-  (part app)
   (fields
    [username :string :indexed]
    [pwd :string "Hashed password string"]
@@ -81,20 +92,52 @@ A picture speaks a thousand words. I don't have a picture, but here's some code:
    [group :ref :many]))
 
 (defschema group
-  (part app)
   (fields
    [name :string]
    [permission :string :many]))
 
 (defn -main [& args]
   (d/create-database db-url)
-  (d/transact (d/connect db-url) (s/build-parts d/tempid))
-  (d/transact (d/connect db-url) (s/build-schema d/tempid)))
+  (d/transact
+   (d/connect db-url)
+   (concat
+    (s/build-parts d/tempid [app])
+    (s/build-schema d/tempid [user group]))))
+
+
+;; Alternatively, you can skip out the defschema and manage the datastructures yourself using schema:
+
+(defn dbparts []
+  [(part "app")])
+
+(defn dbschema []
+  [(schema
+    "user"
+    (fields
+     [username :string :indexed]
+     [pwd :string "Hashed password string"]
+     [email :string :indexed]
+     [status :enum [:pending :active :inactive :cancelled]]
+     [group :ref :many]))
+   
+   (schema
+    "group"
+    (fields
+     [name :string]
+     [permission :string :many]))])
+
+(defn setup-db [url]
+  (d/create-database url)
+  (d/transact
+   (d/connect url)
+   (concat
+    (s/build-parts d/tempid (dbparts))
+    (s/build-schema d/tempid (dbschema)))))
 ```
 
-The crux of this is in the (s/build-parts) and (s/build-schema), which turns your defparts and defschemas into a nice long list of datomic schema transactions.
+You can play around with the example project if you want to see this in action.
 
-You can build specific schema's by calling (s/generate-schema user group) - which will return a list of schema transactions just for those specific schemas, if you prefer to be verbose about it.
+The crux of this is in the (s/build-parts) and (s/build-schema), which turns your defparts and defschemas into a nice long list of datomic schema transactions.
 
 Also notice that :enum resolves to a :ref type, the vector can be a list of strings: ["Pending" "Active" "Inactive" "cancelled"] or a list of keywords as shown. String will be converted to keywords by lowercasing and converting spaces to dashes, so "Bad User" will convert to :user.status/bad-user.
 

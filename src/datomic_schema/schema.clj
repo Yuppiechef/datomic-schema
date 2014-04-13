@@ -1,23 +1,33 @@
 (ns datomic-schema.schema)
 
 ;; The main schema functions
-(defmacro fields [& fielddefs]
+(defmacro fields
+  "Simply a helper for converting (fields [name :string :indexed]) into {:fields {\"name\" [:string #{:indexed}]}}"
+  [& fielddefs]
   (let [defs (reduce (fn [a [nm tp & opts]] (assoc a (name nm) [tp (set opts)])) {} fielddefs)]
     `{:fields ~defs}))
 
-(defonce schemalist (atom #{}))
-(defonce partlist (atom #{}))
+(defn schema*
+  "Simply merges several maps into a single schema definition and add one or two helper properties"
+  [name maps]
+  (apply merge
+   {:name name :basetype (keyword name) :namespace name}
+   maps))
 
-(defmacro defschema [nm & body]
-  `(do
-     (def ~nm (merge ~{:name (name nm) :basetype (keyword (name nm)) :namespace (name nm)} ~@body))
-     (swap! schemalist conj (var ~nm))))
+(defmacro schema
+  [nm & maps]
+  `(schema* ~(name nm) [~@maps]))
+
+(defn part
+  [nm]
+  (keyword "db.part" nm))
+
+(defmacro defschema [nm & maps]
+  `(def ~nm
+     (schema ~nm ~@maps)))
 
 (defmacro defpart [nm]
-  `(swap! partlist conj ~(keyword "db.part" (name nm))))
-
-(defmacro part [nm]
-  `{:part ~(keyword "db.part" (name nm))})
+  `(def ~nm (part ~(name nm))))
 
 ;; The datomic schema conversion functions
 (defn get-enums [tempid-fn basens part enums]
@@ -64,8 +74,8 @@
          :db/ident part
          :db.install/_partition :db.part/db}))
 
-(defn build-parts [tempid-fn]
-  (reduce (partial part-to-datomic tempid-fn) [] @partlist))
+(defn build-parts [tempid-fn partlist]
+  (reduce (partial part-to-datomic tempid-fn) [] partlist))
 
-(defn build-schema [tempid-fn]
-  (apply (partial generate-schema tempid-fn) (map #(deref %) @schemalist)))
+(defn build-schema [tempid-fn entitylist]
+  (apply (partial generate-schema tempid-fn) entitylist))
