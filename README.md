@@ -32,7 +32,7 @@ A 2 second example :
 
 (concat
   (s/generate-parts d/tempid parts)
-  (s/build-schema d/tempid schema)) 
+  (s/generate-schema d/tempid schema)) 
 ```
 
 This will define the attributes:
