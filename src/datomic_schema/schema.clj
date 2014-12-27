@@ -11,8 +11,8 @@
   "Simply merges several maps into a single schema definition and add one or two helper properties"
   [name maps]
   (apply merge
-   {:name name :basetype (keyword name) :namespace name}
-   maps))
+         {:name name :basetype (keyword name) :namespace name}
+         maps))
 
 (defmacro schema
   [nm & maps]
@@ -45,16 +45,17 @@
   (let [uniq (first (remove nil? (map #(unique-mapping %) opts)))
         dbtype (keyword "db.type" (if (= type :enum) "ref" (name type)))
         result
-        {:db/id (tempid-fn :db.part/db)
-         :db/ident (keyword basename fieldname)
-         :db/valueType dbtype
-         :db/index (boolean (opts :indexed))
-         :db/cardinality (if (opts :many) :db.cardinality/many :db.cardinality/one)
-         :db/doc (or (first (filter string? opts)) "")
-         :db/fulltext (boolean (opts :fulltext))
-         :db/isComponent (boolean (opts :component))
-         :db/noHistory (boolean (opts :nohistory))
-         :db.install/_attribute :db.part/db}]
+        (cond-> {:db.install/_attribute :db.part/db
+                 :db/id (tempid-fn :db.part/db)
+                 :db/ident (keyword basename fieldname)
+                 :db/valueType dbtype}
+                (opts :indexed) (assoc :db/index true)
+                (seq (filter string? opts)) (assoc :db/doc
+                                              (first (filter string? opts)))
+                (opts :many) (assoc :db/cardinality :db.cardinality/many)
+                (opts :fulltext) (assoc :db/fulltext true)
+                (opts :component) (assoc :db/isComponent true)
+                (opts :nohistory) (assoc :db/noHistory true))]
     (concat
      acc
      [(if uniq (assoc result :db/unique uniq) result)]
