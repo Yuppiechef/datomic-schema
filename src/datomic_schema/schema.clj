@@ -41,7 +41,7 @@
    :unique-value :db.unique/value
    :unique-identity :db.unique/identity})
 
-(defn field-to-datomic [tempid-fn basename part acc [fieldname [type opts]]]
+(defn field-to-datomic [tempid-fn basename part gen-all? acc [fieldname [type opts]]]
   (let [uniq (first (remove nil? (map #(unique-mapping %) opts)))
         dbtype (keyword "db.type" (if (= type :enum) "ref" (name type)))
         result
@@ -49,22 +49,23 @@
                  :db/id (tempid-fn :db.part/db)
                  :db/ident (keyword basename fieldname)
                  :db/valueType dbtype}
-                (opts :indexed) (assoc :db/index true)
-                (seq (filter string? opts)) (assoc :db/doc
-                                              (first (filter string? opts)))
-                (opts :many) (assoc :db/cardinality :db.cardinality/many)
-                (opts :fulltext) (assoc :db/fulltext true)
-                (opts :component) (assoc :db/isComponent true)
-                (opts :nohistory) (assoc :db/noHistory true))]
+                (or gen-all? (opts :indexed)) (assoc :db/index (boolean (opts :indexed)))
+                (or gen-all? (seq (filter string? opts))) (assoc :db/doc
+                                                           (or (first (filter string? opts)) ""))
+                (or gen-all? (opts :many)) (assoc :db/cardinality
+                                             (if (opts :many) :db.cardinality/many :db.cardinality/one))
+                (or gen-all? (opts :fulltext)) (assoc :db/fulltext (boolean (opts :fulltext)))
+                (or gen-all? (opts :component)) (assoc :db/isComponent (boolean (opts :component)))
+                (or gen-all? (opts :nohistory)) (assoc :db/noHistory (boolean (opts :nohistory))))]
     (concat
      acc
      [(if uniq (assoc result :db/unique uniq) result)]
      (if (= type :enum) (get-enums tempid-fn (str basename "." fieldname) part (first (filter vector? opts)))))))
 
-(defn schema-to-datomic [tempid-fn acc schema]
+(defn schema-to-datomic [tempid-fn gen-all? acc schema]
   (let [key (:namespace schema)
         part (or (:part schema) :db.part/user)]
-    (reduce (partial field-to-datomic tempid-fn key part) acc (:fields schema))))
+    (reduce (partial field-to-datomic tempid-fn key part gen-all?) acc (:fields schema))))
 
 (defn part-to-datomic [tempid-fn acc part]
   (conj acc
@@ -75,8 +76,10 @@
 (defn generate-parts [tempid-fn partlist]
   (reduce (partial part-to-datomic tempid-fn) [] partlist))
 
-(defn generate-schema [tempid-fn schema]
-  (reduce (partial schema-to-datomic tempid-fn) [] schema))
+(defn generate-schema
+  ([tempid-fn schema] (generate-schema tempid-fn schema true))
+  ([tempid-fn schema gen-all?]
+   (reduce (partial schema-to-datomic tempid-fn gen-all?) [] schema)))
 
 ;; Use of the following functions are discouraged and only here for backwards compatibility.
 
