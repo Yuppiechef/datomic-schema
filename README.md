@@ -2,6 +2,8 @@
 
 datomic-schema makes it easier to see your datomic schema without sacrificing any features of Datomic
 
+[![Clojars Project](http://clojars.org/datomic-schema/latest-version.svg)](http://clojars.org/datomic-schema)
+
 See the current [Changelog](https://github.com/Yuppiechef/datomic-schema/wiki/Changelog)
 
 ## Example
