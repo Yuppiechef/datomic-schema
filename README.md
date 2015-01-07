@@ -101,7 +101,18 @@ A picture speaks a thousand words. I don't have a picture, but here's some code:
     (s/generate-schema d/tempid (dbschema)))))
 
 (defn -main [& args]
-  (setup-db db-url))
+  (setup-db db-url)
+  (let [gid (d/tempid :db.part/user)]
+    (d/transact
+     db-url
+     [{:db/id gid
+       :group/name "Staff"
+       :group/permission "Admin"}
+      {:db/id (d/tempid :db.part/user)
+       :user/username "bob"
+       :user/email "bob@example.com"
+       :user/group gid
+       :user/status :user.status/pending}])))
 ```
 
 You can play around with the example project if you want to see this in action.
