@@ -132,4 +132,4 @@ Just a list of keys you'd be interested to use on fields - look at http://docs.d
 
 Copyright © 2013 Yuppiechef Online (Pty) Ltd.
 
-Distributed under the Eclipse Public License, the same as Clojure.
+Distributed under The MIT License (MIT) - See LICENSE.txt
