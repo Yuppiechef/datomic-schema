@@ -2,12 +2,7 @@
 
 datomic-schema makes it easier to see your datomic schema without sacrificing any features of Datomic
 
-## API Changes: v1.1.0
-
-Please note that the defschema and defpart used by default prior to v1.1.0 are now deprecated. The functions will
-continue to live on, but it's recommended that you use the schema and part macro's directly instead.
-
-This is because these functions don't maintain a global state - you'll need to collect the schema yourself and pass that off to the generate-schema function. The global state is messy and doesn't allow libraries and multiple databases to work cleanly.
+See the current [Changelog](https://github.com/Yuppiechef/datomic-schema/wiki/Changelog)
 
 ## Example
 
@@ -58,7 +53,7 @@ You get the idea..
 In leiningen, simply add this to your dependencies
 
 ```clojure
-[datomic-schema "1.1.0"]
+[datomic-schema "1.2.0"]
 ```
 
 Or maven:
@@ -66,7 +61,7 @@ Or maven:
 <dependency>
   <groupId>datomic-schema</groupId>
   <artifactId>datomic-schema</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 
