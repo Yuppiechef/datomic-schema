@@ -122,11 +122,34 @@ Just a list of keys you'd be interested to use on fields - look at http://docs.d
 
 ```clojure
 ;; Types
-:keyword :string :boolean :long :bigint :float :double :bigdec :ref :instant :uuid :uri :bytes :enum
+:keyword :string :boolean :long :bigint :float :double :bigdec :ref :instant
+:uuid :uri :bytes :enum
 
 ;; Options
-:unique-value :unique-identity :indexed :many :fulltext :component :nohistory "Some doc string" [:arbitrary "Enum" :values]
+:unique-value :unique-identity :indexed :many :fulltext :component
+:nohistory "Some doc string" [:arbitrary "Enum" :values]
 ```
+
+## Datomic defaults:
+Datomic has defaults for:
+
+```
+:db/cardinality <:db.cardinality/one>
+:db/index <false>
+:db/fulltext <false>
+:db/noHistory <false>
+:db/component <false>
+:db/doc <"">
+```
+The default behavior of `generate-schema` is to explicitly generate these defaults.
+
+This behavior can be overridden by passing in `false` as the last argument:
+
+`(s/generate-schema d/tempid schema false)`.
+
+Passing in `false` will elide those Datomic default keys, unless of course your `schema`
+defines non-default values.
+
 
 ## License
 
