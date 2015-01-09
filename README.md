@@ -122,7 +122,9 @@ Lastly, the result of (s/schema) and (s/part) are simply just datastructures - y
 
 ## Why pass in the d/tempid?
 
-Because I really didn't want to create a dependency on anything else for this library. Not even datomic. Heck, I'm so pedantic about not wanting deps that I don't even depend on Clojure.
+Because I really didn't want to create a dependency on anything else for this library. Not even datomic. 
+
+I think it's important to realize that all this library does is transform one form of data to another form. It just happens to convert to valid Datomic schema, but the source and target formats are open and usable in other forms and projects that might not use Datomic at all.
 
 ## Possible keys to put on a field:
 
