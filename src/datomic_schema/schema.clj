@@ -48,12 +48,13 @@
         (cond-> {:db.install/_attribute :db.part/db
                  :db/id (tempid-fn :db.part/db)
                  :db/ident (keyword basename fieldname)
-                 :db/valueType dbtype}
+                 :db/valueType dbtype
+                 :db/cardinality (if (opts :many)
+                                   :db.cardinality/many
+                                   :db.cardinality/one)}
                 (or gen-all? (opts :indexed)) (assoc :db/index (boolean (opts :indexed)))
                 (or gen-all? (seq (filter string? opts))) (assoc :db/doc
                                                            (or (first (filter string? opts)) ""))
-                (or gen-all? (opts :many)) (assoc :db/cardinality
-                                             (if (opts :many) :db.cardinality/many :db.cardinality/one))
                 (or gen-all? (opts :fulltext)) (assoc :db/fulltext (boolean (opts :fulltext)))
                 (or gen-all? (opts :component)) (assoc :db/isComponent (boolean (opts :component)))
                 (or gen-all? (opts :nohistory)) (assoc :db/noHistory (boolean (opts :nohistory))))]
