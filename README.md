@@ -142,7 +142,6 @@ Just a list of keys you'd be interested to use on fields - look at http://docs.d
 Datomic has defaults for:
 
 ```
-:db/cardinality <:db.cardinality/one>
 :db/index <false>
 :db/fulltext <false>
 :db/noHistory <false>
@@ -157,6 +156,8 @@ This behavior can be overridden by passing in `false` as the last argument:
 
 Passing in `false` will elide those Datomic default keys, unless of course your `schema`
 defines non-default values.
+
+Note, that Datomic requires that `:db/cardinality` be explicitly set for each attribute installed. `generate-schema` will default to `:db.cardinality/one` unless the `schema` passed in specifies otherwise.
 
 
 ## License
