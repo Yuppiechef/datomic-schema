@@ -1,4 +1,4 @@
-(defproject datomic-schema "1.2.1"
+(defproject datomic-schema "1.2.2"
   :description "Schema generator for Datomic that won't set your boots alight"
   :url "http://www.github.com/Yuppiechef/datomic-schema"
   :license {:name "Eclipse Public License"

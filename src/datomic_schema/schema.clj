@@ -64,9 +64,11 @@
      (if (= type :enum) (get-enums tempid-fn (str basename "." fieldname) part (first (filter vector? opts)))))))
 
 (defn schema-to-datomic [tempid-fn gen-all? acc schema]
-  (let [key (:namespace schema)
-        part (or (:part schema) :db.part/user)]
-    (reduce (partial field-to-datomic tempid-fn key part gen-all?) acc (:fields schema))))
+  (if (or (:db/id schema) (vector? schema))
+    (conj acc schema) ;; This must be a raw schema definition
+    (let [key (:namespace schema)
+          part (or (:part schema) :db.part/user)]
+      (reduce (partial field-to-datomic tempid-fn key part gen-all?) acc (:fields schema)))))
 
 (defn part-to-datomic [tempid-fn acc part]
   (conj acc
