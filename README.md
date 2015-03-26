@@ -6,6 +6,16 @@ datomic-schema makes it easier to see your datomic schema without sacrificing an
 
 See the current [Changelog](https://github.com/Yuppiechef/datomic-schema/wiki/Changelog)
 
+## 1.3.0 API Breaking change
+
+It's subtle, but the `(generate-schema)` optionally takes an option map instead of a boolean for `gen-all?`
+
+This is to arbitrarily support extra generating options, including the new `index-all?` option, which flags every attribute in the schema for indexing (in line with Stuart Halloway's recommendation that you simply turn indexing on for every attribute by default).
+
+The `defschema` and `defpart` macro's have been removed along with their `build-parts` and `build-schema` counterparts. These do not lead to good code design and it is encouraged that you remove them from your code at any rate.
+
+Lastly, the `field-to-datomic`, `schema-to-datomic` and `part-to-datomic` functions have all been renamed to `field->datomic`, `schema->datomic` and `part->datomic` respectively. This is really just an implementation detail, so it shouldn't have much impact.
+
 ## Example
 
 A 2 second example :
@@ -28,8 +38,8 @@ A 2 second example :
      [permission :string :many]))])
 
 (concat
-  (s/generate-parts d/tempid parts)
-  (s/generate-schema d/tempid schema)) 
+  (s/generate-parts parts)
+  (s/generate-schema schema)) 
 ```
 
 This will define the attributes:
@@ -48,6 +58,22 @@ This will define the attributes:
 :group/permission, :db.type/string, :db.cardinality/many
 ```
 
+Also, as of 1.3.0, you can define database functions either as `defdbfn`, which creates a namespaced var so that you can use it inside your current process, or using `dbfn` which emits a map that you can directly transact:
+
+```
+(defdbfn dbinc [db e a qty] :db.part/user
+  [[:db/add e a (+ qty (or (get (d/entity db e) a) 0))]])
+
+(def db-schema
+  (concat
+   [(dbfn
+     dbdec [db e a qty] :db.part/user
+     [[:db/add e a (- (or (get (d/entity db e) a) 0) qty)]])]
+   (dbfns->datomic dbinc)))
+```
+
+See the [more exhaustive example](https://github.com/Yuppiechef/datomic-schema/blob/master/test/datomic_schema/schematest.clj)
+
 You get the idea..
 
 ## Usage
@@ -55,7 +81,7 @@ You get the idea..
 In leiningen, simply add this to your dependencies
 
 ```clojure
-[datomic-schema "1.2.0"]
+[datomic-schema "1.3.0"]
 ```
 
 Or maven:
@@ -63,7 +89,7 @@ Or maven:
 <dependency>
   <groupId>datomic-schema</groupId>
   <artifactId>datomic-schema</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
@@ -71,6 +97,9 @@ A picture speaks a thousand words. I don't have a picture, but here's some code:
 
 ```clojure
 (defonce db-url "datomic:mem://testdb")
+
+(defdbfn dbinc [db e a qty] :db.part/user
+  [[:db/add e a (+ qty (or (get (d/entity db e) a) 0))]])
 
 (defn dbparts []
   [(part "app")])
@@ -94,8 +123,9 @@ A picture speaks a thousand words. I don't have a picture, but here's some code:
   (d/transact
    (d/connect url)
    (concat
-    (s/generate-parts d/tempid (dbparts))
-    (s/generate-schema d/tempid (dbschema)))))
+    (s/generate-parts (dbparts))
+    (s/generate-schema (dbschema))
+    (s/dbfns->datomic dbinc)))))
 
 (defn -main [& args]
   (setup-db db-url)
@@ -119,12 +149,6 @@ The crux of this is in the (s/generate-parts) and (s/generate-schema), which tur
 Also notice that :enum resolves to a :ref type, the vector can be a list of strings: ["Pending" "Active" "Inactive" "cancelled"] or a list of keywords as shown. String will be converted to keywords by lowercasing and converting spaces to dashes, so "Bad User" will convert to :user.status/bad-user.
 
 Lastly, the result of (s/schema) and (s/part) are simply just datastructures - you can build them up yourself, add your own metadata or store them off. Your call.
-
-## Why pass in the d/tempid?
-
-Because I really didn't want to create a dependency on anything else for this library. Not even datomic. 
-
-I think it's important to realize that all this library does is transform one form of data to another form. It just happens to convert to valid Datomic schema, but the source and target formats are open and usable in other forms and projects that might not use Datomic at all.
 
 ## Possible keys to put on a field:
 
@@ -152,15 +176,24 @@ Datomic has defaults for:
 ```
 The default behavior of `generate-schema` is to explicitly generate these defaults.
 
-This behavior can be overridden by passing in `false` as the last argument:
+This behavior can be overridden by passing in `:gen-all?` as `false`:
 
-`(s/generate-schema d/tempid schema false)`.
+```
+(s/generate-schema schema :gen-all? false)
+```
 
-Passing in `false` will elide those Datomic default keys, unless of course your `schema`
+Passing `:gen-all` as `false` will elide those Datomic default keys, unless of course your `schema`
 defines non-default values.
 
 Note, that Datomic requires that `:db/cardinality` be explicitly set for each attribute installed. `generate-schema` will default to `:db.cardinality/one` unless the `schema` passed in specifies otherwise.
 
+## Indexing
+
+By default, attributes have `:db/index false`. If you would like every attribute in your schema to have `:db/index true` then simply include `:index-all? true` in your `generate-schema` call:
+
+```
+(s/generate-schema schema :index-all? true)
+```
 
 ## License
 

@@ -30,8 +30,8 @@
   (d/transact
    (d/connect url)
    (concat
-    (s/generate-parts d/tempid (dbparts))
-    (s/generate-schema d/tempid (dbschema)))))
+    (s/generate-parts (dbparts))
+    (s/generate-schema (dbschema)))))
 
 (defn -main [& args]
   (setup-db db-url)
