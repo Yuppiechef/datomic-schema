@@ -1,6 +1,6 @@
 (ns example.core
   (:use
-   [datomic-schema.schema :only [defpart defschema fields part schema]])
+   [datomic-schema.schema :only [fields part schema]])
   (:require
    [datomic.api :as d]
    [datomic-schema.schema :as s])
