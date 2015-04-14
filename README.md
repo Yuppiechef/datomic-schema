@@ -21,19 +21,21 @@ Lastly, the `field-to-datomic`, `schema-to-datomic` and `part-to-datomic` functi
 A 2 second example :
 
 ```clojure
-(def parts [(part "app")])
+(require '[datomic-schema.schema :as s])
+
+(def parts [(s/part "app")])
 
 (def schema
-  [(schema user
-    (fields
+  [(s/schema user
+    (s/fields
      [username :string :indexed]
      [pwd :string "Hashed password string"]
      [email :string :indexed]
      [status :enum [:pending :active :inactive :cancelled]]
      [group :ref :many]))
    
-   (schema group
-    (fields
+   (s/schema group
+    (s/fields
      [name :string]
      [permission :string :many]))])
 
