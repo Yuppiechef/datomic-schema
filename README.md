@@ -181,7 +181,7 @@ The default behavior of `generate-schema` is to explicitly generate these defaul
 This behavior can be overridden by passing in `:gen-all?` as `false`:
 
 ```
-(s/generate-schema schema :gen-all? false)
+(s/generate-schema schema {:gen-all? false})
 ```
 
 Passing `:gen-all` as `false` will elide those Datomic default keys, unless of course your `schema`
@@ -194,7 +194,7 @@ Note, that Datomic requires that `:db/cardinality` be explicitly set for each at
 By default, attributes have `:db/index false`. If you would like every attribute in your schema to have `:db/index true` then simply include `:index-all? true` in your `generate-schema` call:
 
 ```
-(s/generate-schema schema :index-all? true)
+(s/generate-schema schema {:index-all? true})
 ```
 
 ## License
