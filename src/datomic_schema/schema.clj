@@ -59,7 +59,7 @@
     (concat
      acc
      [(if uniq (assoc result :db/unique uniq) result)]
-     (if (= type :enum) (get-enums (str basename "." fieldname) part (first (filter vector? opts)))))))
+     (if (= type :enum) (get-enums (if basename (str basename "." fieldname) fieldname) part (first (filter vector? opts)))))))
 
 (defn schema->datomic [opts acc schema]
   (if (or (:db/id schema) (vector? schema))
