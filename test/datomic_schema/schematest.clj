@@ -115,3 +115,15 @@
         (assert (= 10506 (:asset/value (uuid-ent c asset))))))
     (finally
       (d/delete-database duri))))
+
+(defdbfn with-assertion [db txs] :db.part/user
+  (assert txs "first argument must be provided")
+  txs)
+
+(deftest database-functions []
+  (let [c (d/connect duri)]
+    @(d/transact c (dbfns->datomic with-assertion))
+    @(d/transact c [[:with-assertion [{:db/id (d/tempid :db.part/user)
+                                       :db/ident :foo}]]])
+    (assert (d/entid (d/db c) :foo) ":foo must be transacted")
+    ))

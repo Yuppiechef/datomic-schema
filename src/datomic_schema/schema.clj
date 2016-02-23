@@ -49,10 +49,10 @@
              :db/cardinality (if (opts :many) :db.cardinality/many :db.cardinality/one)}
           (or index-all? gen-all? (opts :indexed))
           (assoc :db/index (boolean (or index-all? (opts :indexed))))
-          
+
           (or gen-all? (seq (filter string? opts)))
           (assoc :db/doc (or (first (filter string? opts)) ""))
-          
+
           (or gen-all? (opts :fulltext)) (assoc :db/fulltext (boolean (opts :fulltext)))
           (or gen-all? (opts :component)) (assoc :db/isComponent (boolean (opts :component)))
           (or gen-all? (opts :nohistory)) (assoc :db/noHistory (boolean (opts :nohistory))))]
@@ -84,12 +84,13 @@
 
 (defmacro dbfn
   [name params partition & code]
-  `{:db/id (datomic.api/tempid ~partition)
-    :db/ident ~(keyword name)
-    :db/fn (df/construct
-            {:lang "clojure"
-             :params '~params
-             :code '~@code})})
+  (let [code-in-do `(do ~@code)]
+    `{:db/id (datomic.api/tempid ~partition)
+      :db/ident ~(keyword name)
+      :db/fn (df/construct
+              {:lang "clojure"
+               :params '~params
+               :code '~code-in-do})}))
 
 (defmacro defdbfn
   "Define a datomic database function. All calls to datomic api's should be namespaced with datomic.api/ and you cannot use your own namespaces (since the function runs inside datomic)
