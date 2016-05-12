@@ -42,7 +42,7 @@
         dbtype (keyword "db.type" (if (= type :enum) "ref" (name type)))
         result
         (cond->
-            {:db.install/_attribute :db.part/db
+            {(if (:alter! opts) :db.alter/_attribute :db.install/_attribute) :db.part/db
              :db/id (d/tempid :db.part/db)
              :db/ident (keyword basename fieldname)
              :db/valueType dbtype

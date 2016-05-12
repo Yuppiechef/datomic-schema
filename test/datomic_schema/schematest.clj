@@ -102,8 +102,8 @@
         (assert (= 4 (count (d/q '[:find ?e ?t :in $ [?types ...] :where [?e :base/type ?t] [?e :base/type ?types]] (d/db c) [:group :user :asset]))))
 
         (assert (= 10200 (:asset/value (uuid-ent c asset))))
-        
-        ;; Try out a local database function 
+
+        ;; Try out a local database function
         (assert (= 11000 (last (last (dbinc (d/db c) [:base/uuid (:base/uuid asset)] :asset/value 800)))))
 
         ;; Then use it in a transaction
@@ -127,3 +127,15 @@
                                        :db/ident :foo}]]])
     (assert (d/entid (d/db c) :foo) ":foo must be transacted")
     ))
+
+(deftest field-action []
+  (let [common-opts {:db/noHistory false, :db/cardinality :db.cardinality/one
+                     :db/index false, :db/fulltext false, :db/doc "", :db/isComponent false}
+        opts #(merge common-opts %)
+        without-ids (fn [s] (map #(dissoc % :db/id) s))]
+    (is (= (set (without-ids (generate-schema [(schema user (fields [:name :string] [:irrelevant/address :string]
+                                                                    [id :string] [age :long :alter!]))])))
+           #{(opts {:db/valueType :db.type/string, :db/ident :user/name, :db.install/_attribute :db.part/db})
+             (opts {:db/valueType :db.type/string, :db/ident :user/address, :db.install/_attribute :db.part/db})
+             (opts {:db/valueType :db.type/string, :db/ident :user/id, :db.install/_attribute :db.part/db})
+             (opts {:db/valueType :db.type/long, :db/ident :user/age, :db.alter/_attribute :db.part/db})}))))
