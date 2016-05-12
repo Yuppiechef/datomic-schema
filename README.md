@@ -164,7 +164,14 @@ Just a list of keys you'd be interested to use on fields - look at http://docs.d
 ;; Options
 :unique-value :unique-identity :indexed :many :fulltext :component
 :nohistory "Some doc string" [:arbitrary "Enum" :values]
+:alter!
 ```
+
+### Altering schema
+
+If you need to update an option of an existing field - add an `:alter!` option
+key. This way a `:db.alter/_attribute` will be generated instead of a default
+`:db.install/_attribute`.
 
 ## Datomic defaults:
 Datomic has defaults for:
