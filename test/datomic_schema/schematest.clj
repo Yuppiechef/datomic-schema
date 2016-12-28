@@ -121,6 +121,7 @@
   txs)
 
 (deftest database-functions []
+  (d/create-database duri)
   (let [c (d/connect duri)]
     @(d/transact c (dbfns->datomic with-assertion))
     @(d/transact c [[:with-assertion [{:db/id (d/tempid :db.part/user)
