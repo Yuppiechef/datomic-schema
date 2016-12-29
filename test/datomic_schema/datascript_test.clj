@@ -83,8 +83,9 @@
              :base/uuid (d/squuid)
              :base/dateadded (java.util.Date.)
              :asset/serial "1234"
-             ;; form not accepted by datascript (ident support is partial)
-             ;:asset/tag [:asset.tag/computer :asset.tag/expensive]
+             ;; see https://github.com/tonsky/datascript/wiki/Tips-&-tricks#referencing-entities-via-ident-codes
+             :asset/tag [[:db/ident :asset.tag/computer]
+                         [:db/ident :asset.tag/expensive]]
              :asset/datepurchased #inst "2014-12-25"
              :asset/value 10200
              :asset/deflationrate 12.445
