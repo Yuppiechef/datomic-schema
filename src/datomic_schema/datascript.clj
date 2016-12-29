@@ -1,8 +1,5 @@
 (ns datomic-schema.datascript
-  (require [datascript.core]))
-
-(def ^{:private true} tempid-fn datascript.core/tempid)
-(def constant-schema [{:db/ident {:db/unique :db.unique/identity}}])
+  (require [datascript.core :as d]))
 
 (load "-shared")
 

@@ -1,15 +1,9 @@
 (ns datomic-schema.schema
   "Datomic, vs DataScript, helpers"
-  (require [datomic.api]))
-
-(def ^{:private true} tempid-fn datomic.api/tempid)
-(def constant-schema [])
+  (require [datomic.api :as d]
+           [datomic.function :as df]))
 
 (load "-shared")
-
-; not putting these earlier in ns to ensure that references from common are errors
-(require '[datomic.api :as d])
-(require '[datomic.function :as df])
 
 ;; Datomic (not Datascript) definitions below here
 

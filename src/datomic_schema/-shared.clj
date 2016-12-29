@@ -1,7 +1,6 @@
 ;;; NOT A STANDALONE NAMESPACE!
 ;;;
-;;; this should be included into a namespace with tempid-fn already defined,
-;;; and either datomic.api or datascript.core aliased as "d"
+;;; this should be included into a namespace with either datomic.api or datascript.core aliased as "d"
 
 ;; The main schema functions
 (defmacro fields
@@ -29,7 +28,7 @@
 (defn get-enums [basens part enums]
   (map (fn [n]
          (let [nm (if (string? n) (.replaceAll (.toLowerCase ^String n) " " "-") (name n))]
-           [:db/add (tempid-fn part) :db/ident (keyword basens nm)])) enums))
+           [:db/add (d/tempid part) :db/ident (keyword basens nm)])) enums))
 
 (def unique-mapping
   {:db.unique/value :db.unique/value
@@ -43,7 +42,7 @@
         result
         (cond->
             {(if (:alter! opts) :db.alter/_attribute :db.install/_attribute) :db.part/db
-             :db/id (tempid-fn :db.part/db)
+             :db/id (d/tempid :db.part/db)
              :db/ident (keyword basename fieldname)
              :db/valueType dbtype
              :db/cardinality (if (opts :many) :db.cardinality/many :db.cardinality/one)}
@@ -70,7 +69,7 @@
 
 (defn part->datomic [acc part]
   (conj acc
-        {:db/id (tempid-fn :db.part/db),
+        {:db/id (d/tempid :db.part/db),
          :db/ident part
          :db.install/_partition :db.part/db}))
 
