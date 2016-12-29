@@ -122,12 +122,14 @@
 
 (deftest database-functions []
   (d/create-database duri)
-  (let [c (d/connect duri)]
-    @(d/transact c (dbfns->datomic with-assertion))
-    @(d/transact c [[:with-assertion [{:db/id (d/tempid :db.part/user)
-                                       :db/ident :foo}]]])
-    (assert (d/entid (d/db c) :foo) ":foo must be transacted")
-    ))
+  (try
+    (let [c (d/connect duri)]
+      @(d/transact c (dbfns->datomic with-assertion))
+      @(d/transact c [[:with-assertion [{:db/id (d/tempid :db.part/user)
+                                         :db/ident :foo}]]])
+      (assert (d/entid (d/db c) :foo) ":foo must be transacted"))
+    (finally
+      (d/delete-database duri))))
 
 (deftest field-action []
   (let [common-opts {:db/noHistory false, :db/cardinality :db.cardinality/one
