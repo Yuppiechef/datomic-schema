@@ -7,6 +7,14 @@
 (defdbfn dbinc [db e a qty] :db.part/user
   [[:db/add e a (+ qty (or (get (d/entity db e) a) 0))]])
 
+(def test-schema (schema testschema
+                  {:fields {"name" [:string #{:indexed}]}}))
+
+(def test-fields (fields
+                  [uuid :uuid :unique-identity]
+                  [type :keyword]
+                  [dateadded :instant]))
+
 (def db-schema
   [(dbfn
     dbdec [db e a qty] :db.part/user

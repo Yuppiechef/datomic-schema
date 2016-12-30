@@ -1,9 +1,26 @@
 (ns datomic-schema.schema
   "Datomic, vs DataScript, helpers"
-  (require [datomic.api :as d]
-           [datomic.function :as df]))
+  (:require [datomic.api :as d]
+            [datomic.function :as df]
+            [datomic-schema.shared :as ds]))
 
-(load "-shared")
+(defn schema*         [& args] (apply ds/schema* args))
+(defn part            [& args] (apply ds/part args))
+(def  get-enums       (partial ds/-get-enums d/tempid))
+(def  generate-schema (partial ds/-generate-schema d/tempid))
+
+;;; TODO: Make user responsible for "name" being a string, then de-macroize this
+;; ...backwards compatibility: still support symbol in clj; string-only in cljs
+(defmacro fields
+  "Simply a helper for converting (fields [name :string :indexed]) into {:fields {\"name\" [:string #{:indexed}]}}"
+  [& fielddefs]
+  (let [defs (reduce (fn [a [nm tp & opts]] (assoc a (name nm) [tp (set opts)])) {} fielddefs)]
+    `{:fields ~defs}))
+
+;; same thing: in clojurescript, user's responsibility to provide a string; in clojure, support both.
+(defmacro schema
+  [nm & maps]
+  `(schema* ~(name nm) [~@maps]))
 
 ;; Datomic (not Datascript) definitions below here
 
@@ -34,4 +51,3 @@
 
 (defn dbfns->datomic [& dbfn]
   (map (comp :tx meta) dbfn))
-

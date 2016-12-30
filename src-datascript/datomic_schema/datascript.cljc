@@ -1,7 +1,20 @@
 (ns datomic-schema.datascript
-  (require [datascript.core :as d]))
+  (:require [datascript.core :as d]
+            [datomic-schema.shared :as ds]))
 
-(load "-shared")
+(defn schema*         [& args] (apply ds/schema* args))
+(defn part            [& args] (apply ds/part args))
+(def  get-enums       (partial ds/-get-enums d/tempid))
+(def  generate-schema (partial ds/-generate-schema d/tempid))
+
+(defn fields
+  "Simply a helper for converting (fields [\"name\" :string :indexed]) into {:fields {\"name\" [:string #{:indexed}]}}"
+  [& fielddefs]
+  (let [defs (reduce (fn [a [nm tp & opts]] (assoc a (name nm) [tp (set opts)])) {} fielddefs)]
+    {:fields defs}))
+
+(defn schema [nm & maps]
+  (apply schema* (str nm) maps))
 
 (defn datascript-schema [generated-schema]
   (loop [generated-map {:db/ident {:db/unique :db.unique/identity}}
