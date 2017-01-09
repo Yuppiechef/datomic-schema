@@ -8,6 +8,7 @@
 (defn part            [& args] (apply ds/part args))
 (def  get-enums       (partial ds/-get-enums d/tempid))
 (def  generate-schema (partial ds/-generate-schema d/tempid))
+(def  generate-parts  (partial ds/-generate-parts d/tempid))
 
 ;;; TODO: Make user responsible for "name" being a string, then de-macroize this
 ;; ...backwards compatibility: still support symbol in clj; string-only in cljs
