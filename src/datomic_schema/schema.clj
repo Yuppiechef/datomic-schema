@@ -44,7 +44,8 @@
         (cond->
             {(if (:alter! opts) :db.alter/_attribute :db.install/_attribute) :db.part/db
              :db/id (d/tempid :db.part/db)
-             :db/ident (keyword basename fieldname)
+             :db/ident (if basename (keyword basename fieldname)
+                          (keyword fieldname))
              :db/valueType dbtype
              :db/cardinality (if (opts :many) :db.cardinality/many :db.cardinality/one)}
           (or index-all? gen-all? (opts :indexed))
