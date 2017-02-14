@@ -28,7 +28,10 @@
 ;; The datomic schema conversion functions
 (defn get-enums [basens part enums]
   (map (fn [n]
-         (let [nm (if (string? n) (.replaceAll (.toLowerCase ^String n) " " "-") (name n))]
+         (let [basens (if-let [n (and (keyword? n) (namespace n))] n basens)
+               nm (if (string? n)
+                    (.replaceAll (.toLowerCase ^String n) " " "-")
+                    (name n))]
            [:db/add (d/tempid part) :db/ident (keyword basens nm)])) enums))
 
 (def unique-mapping

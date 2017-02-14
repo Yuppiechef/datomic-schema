@@ -22,6 +22,7 @@
     (fields
      [serial :string]
      [tag :enum [:computer :furniture :expensive :cheap :consumable] :many]
+     [ns-tag :enum [:the/computer :very/expensive]]
      [datepurchased :instant]
      [value :long]
      [deflationrate :float]
@@ -90,6 +91,7 @@
              :base/dateadded (java.util.Date.)
              :asset/serial "1234"
              :asset/tag [:asset.tag/computer :asset.tag/expensive]
+             :asset/ns-tag [:the/computer :very/expensive]
              :asset/datepurchased #inst "2014-12-25"
              :asset/value 10200
              :asset/deflationrate 12.445
