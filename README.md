@@ -206,6 +206,6 @@ By default, attributes have `:db/index false`. If you would like every attribute
 
 ## License
 
-Copyright © 2013 Yuppiechef Online (Pty) Ltd.
+Copyright © 2019 Yuppiechef Online (Pty) Ltd.
 
 Distributed under The MIT License (MIT) - See LICENSE.txt
