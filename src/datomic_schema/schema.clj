@@ -23,7 +23,7 @@
 
 (defn part
   [nm]
-  (keyword "db.part" nm))
+  (keyword nm))
 
 ;; The datomic schema conversion functions
 (defn get-enums [basens part enums]
